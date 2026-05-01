@@ -17,14 +17,32 @@ const Reports = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchReports = async () => {
+  const fetchReports = async () => {
+    try {
+      setLoading(true);
       const data = await adminService.getRecentReports();
       setReports(data);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+    } finally {
       setLoading(false);
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchReports();
   }, []);
+
+  const handleStatusUpdate = async (id, status) => {
+    try {
+      await adminService.updateReportStatus(id, status);
+      // Refresh reports list
+      fetchReports();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status");
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
@@ -132,7 +150,12 @@ const Reports = () => {
                         <button className="p-2 rounded-lg hover:bg-secondary text-primary transition-colors" title="View Details">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-2 rounded-lg hover:bg-secondary text-success transition-colors" title="Mark Resolved">
+                        <button 
+                          className="p-2 rounded-lg hover:bg-secondary text-success transition-colors" 
+                          title="Mark Resolved"
+                          onClick={() => handleStatusUpdate(report.id, 'resolved')}
+                          disabled={report.status === 'resolved'}
+                        >
                           <CheckCircle className="w-4 h-4" />
                         </button>
                         <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-colors">

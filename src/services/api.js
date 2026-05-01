@@ -118,5 +118,14 @@ export const adminService = {
       body: JSON.stringify(userData)
     });
     return await handleResponse(response);
+  },
+
+  updateReportStatus: async (id, status) => {
+    const response = await fetch(`${API_BASE_URL}/reports/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ status })
+    });
+    return await handleResponse(response);
   }
 };
