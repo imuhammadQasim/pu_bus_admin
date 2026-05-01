@@ -80,13 +80,13 @@ const Buses = () => {
                       <span className="text-sm font-bold text-foreground">{bus.busNumber}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-muted-foreground">{bus.route}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-foreground">{bus.driver}</td>
-                  <td className="px-6 py-4 text-sm font-mono text-muted-foreground">{bus.capacity}</td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">{bus.route?.name || 'Unassigned'}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{bus.driver || 'TBD'}</td>
+                  <td className="px-6 py-4 text-sm font-mono text-muted-foreground">{bus.capacity || '72'}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                      bus.status === 'Active' ? 'bg-success/10 text-success border-success/20' : 
-                      bus.status === 'In Maintenance' ? 'bg-pu-red/10 text-pu-red border-pu-red/20' : 
+                      bus.status === 'ACTIVE' ? 'bg-success/10 text-success border-success/20' : 
+                      bus.status === 'MAINTENANCE' ? 'bg-pu-red/10 text-pu-red border-pu-red/20' : 
                       'bg-pu-gold/10 text-pu-gold border-pu-gold/20'
                     }`}>
                       {bus.status}

@@ -75,29 +75,29 @@ const LostFound = () => {
                 </span>
               </div>
 
-              <h3 className="text-lg font-bold text-foreground mb-2">{item.item}</h3>
+              <h3 className="text-lg font-bold text-foreground mb-2">{item.title}</h3>
               
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Tag className="w-4 h-4" />
-                  <span className="font-medium">{item.category}</span>
+                  <span className="font-medium">{item.category} ({item.type})</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <MapPin className="w-4 h-4" />
-                  <span className="font-medium">{item.location}</span>
+                  <span className="font-medium">{item.route?.name || 'Unknown Route'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="w-4 h-4" />
-                  <span className="font-medium">Found by: {item.reportedBy}</span>
+                  <span className="font-medium">Reported by: {item.user?.firstName} {item.user?.lastName}</span>
                 </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground/60 uppercase">
                   <Clock className="w-3.5 h-3.5" />
-                  {item.date}
+                  {new Date(item.createdAt).toLocaleDateString()}
                 </div>
-                {item.status === 'pending' && (
+                {item.status === 'active' && (
                   <button className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Mark Returned

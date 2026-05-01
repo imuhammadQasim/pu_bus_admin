@@ -151,17 +151,17 @@ const Dashboard = () => {
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm border border-primary/5 group-hover:bg-primary group-hover:text-white transition-colors">
-                          {report.initials}
+                          {report.user?.firstName?.[0] || 'U'}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-foreground">{report.user}</p>
-                          <p className="text-xs text-muted-foreground font-medium">{report.type} • <span className="text-primary/70">{report.route}</span></p>
+                          <p className="text-sm font-bold text-foreground">{report.user?.firstName} {report.user?.lastName}</p>
+                          <p className="text-xs text-muted-foreground font-medium">{report.type} • <span className="text-primary/70">{report.route?.name || report.busNumber || 'N/A'}</span></p>
                         </div>
                       </div>
                       <div className="flex items-center gap-6">
                         <span className="text-xs text-muted-foreground font-medium hidden sm:flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5" />
-                          {report.time}
+                          {new Date(report.createdAt).toLocaleDateString()}
                         </span>
                         <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm ${
                           report.status === 'pending' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100'

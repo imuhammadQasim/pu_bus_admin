@@ -59,7 +59,7 @@ const Routes = () => {
               <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">{route.name}</h3>
               <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5 mt-1">
                 <MapPin className="w-3.5 h-3.5" />
-                {route.origin} → {route.destination}
+                {route.desc || 'No description available'}
               </p>
 
               <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-border/50">
@@ -67,14 +67,14 @@ const Routes = () => {
                   <Layers className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-[10px] uppercase font-bold text-muted-foreground leading-none">Stops</p>
-                    <p className="text-sm font-bold text-foreground">{route.stops}</p>
+                    <p className="text-sm font-bold text-foreground">{route.waypoints?.length || 0}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Bus className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-[10px] uppercase font-bold text-muted-foreground leading-none">Buses</p>
-                    <p className="text-sm font-bold text-foreground">{route.buses}</p>
+                    <p className="text-sm font-bold text-foreground">{route.buses?.length || 0}</p>
                   </div>
                 </div>
               </div>

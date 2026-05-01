@@ -53,17 +53,17 @@ const Users = () => {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center text-primary font-bold text-lg border border-border">
-                    {user.name[0]}
+                    {user.firstName?.[0] || 'U'}
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-foreground">{user.name}</h3>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{user.department} Dept.</p>
+                    <h3 className="text-base font-bold text-foreground">{user.firstName} {user.lastName}</h3>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{user.role}</p>
                   </div>
                 </div>
                 <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
-                  user.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  user.isVerified ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                 }`}>
-                  {user.status}
+                  {user.isVerified ? 'Verified' : 'Unverified'}
                 </span>
               </div>
 
@@ -73,7 +73,7 @@ const Users = () => {
                   {user.email}
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Joined: {user.joinDate}</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Joined: {new Date(user.createdAt).toLocaleDateString()}</span>
                   <div className="flex items-center gap-2">
                     <button className="p-1.5 hover:bg-secondary rounded-lg text-muted-foreground hover:text-primary transition-colors">
                       <UserCheck className="w-4 h-4" />

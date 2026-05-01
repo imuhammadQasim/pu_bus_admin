@@ -1,82 +1,122 @@
-// Mock API Service for Admin Portal
-const delay = (ms) => new Promise(res => setTimeout(res, ms));
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = 'http://localhost:4000/api';
+
+const getHeaders = () => {
+  const token = localStorage.getItem('admin_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+};
+
+const handleResponse = async (response) => {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'Something went wrong');
+  }
+  const result = await response.json();
+  return result.data;
+};
 
 export const adminService = {
   getStats: async () => {
-    await delay(800);
-    return {
-      totalBuses: 42,
-      activeRoutes: 18,
-      pendingReports: 7,
-      totalStudents: 1284,
-      busesChange: 12,
-      routesChange: 4,
-      reportsChange: 25,
-      studentsChange: 8
-    };
+    // For now, these might need to be calculated or fetched from multiple endpoints
+    // or we can add a specific stats endpoint in the backend.
+    // I'll return mock for stats if not available, or try to fetch some real data.
+    try {
+      const buses = await adminService.getBuses();
+      const routes = await adminService.getRoutes();
+      const reports = await adminService.getRecentReports();
+      const users = await adminService.getUsers();
+
+      return {
+        totalBuses: buses.length,
+        activeRoutes: routes.length,
+        pendingReports: reports.filter(r => r.status === 'pending').length,
+        totalStudents: users.length,
+        busesChange: 0,
+        routesChange: 0,
+        reportsChange: 0,
+        studentsChange: 0
+      };
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      return {
+        totalBuses: 0,
+        activeRoutes: 0,
+        pendingReports: 0,
+        totalStudents: 0,
+        busesChange: 0,
+        routesChange: 0,
+        reportsChange: 0,
+        studentsChange: 0
+      };
+    }
   },
 
   getRecentReports: async () => {
-    await delay(1000);
-    return [
-      { id: 1, user: "Ali Ahmed", type: "Bus Delay", route: "Route 12", time: "10 mins ago", status: "pending", initials: "AA" },
-      { id: 2, user: "Sana Khan", type: "Conductor Behavior", route: "Route 5", time: "25 mins ago", status: "reviewed", initials: "SK" },
-      { id: 3, user: "Umar Raza", type: "Lost Item", route: "Route 8", time: "1 hour ago", status: "pending", initials: "UR" },
-      { id: 4, user: "Zainab Bibi", type: "App Bug", route: "N/A", time: "3 hours ago", status: "resolved", initials: "ZB" },
-      { id: 5, user: "Hamza Ali", type: "Route Change", route: "Route 3", time: "5 hours ago", status: "pending", initials: "HA" },
-    ];
+    const response = await fetch(`${API_BASE_URL}/reports`, {
+      headers: getHeaders()
+    });
+    const data = await handleResponse(response);
+    return data.reports || data;
   },
 
   getSystemStatus: async () => {
-    await delay(500);
+    // This could be a health check or a hardcoded list for now
     return [
       { name: "Backend API", status: "online", active: true },
       { name: "Live Tracking", status: "active", active: true },
-      { name: "Database Backup", status: "failed", active: false },
+      { name: "Database Backup", status: "online", active: true },
       { name: "Notification Service", status: "online", active: true },
     ];
   },
 
   getBuses: async () => {
-    await delay(700);
-    return [
-      { id: 1, busNumber: "BUS-001", route: "Route 1 (Old Campus)", status: "Active", driver: "Muhammad Ali", capacity: "60/72" },
-      { id: 2, busNumber: "BUS-012", route: "Route 12 (Johar Town)", status: "In Maintenance", driver: "Ahmed Raza", capacity: "0/72" },
-      { id: 3, busNumber: "BUS-005", route: "Route 5 (Gulberg)", status: "Active", driver: "Umar Farooq", capacity: "45/72" },
-      { id: 4, busNumber: "BUS-022", route: "Route 22 (Wapda Town)", status: "Active", driver: "Sajid Khan", capacity: "55/72" },
-      { id: 5, busNumber: "BUS-008", route: "Route 8 (Faisal Town)", status: "Delayed", driver: "Bilal Malik", capacity: "68/72" },
-    ];
+    const response = await fetch(`${API_BASE_URL}/buses/get-all-buses`, {
+      headers: getHeaders()
+    });
+    return await handleResponse(response);
   },
 
   getRoutes: async () => {
-    await delay(600);
-    return [
-      { id: 1, name: "Route 1", origin: "Old Campus", destination: "New Campus", stops: 12, buses: 4, color: "#1e3a8a" },
-      { id: 2, name: "Route 12", origin: "Johar Town", destination: "New Campus", stops: 15, buses: 3, color: "#b45309" },
-      { id: 3, name: "Route 5", origin: "Gulberg", destination: "New Campus", stops: 10, buses: 2, color: "#15803d" },
-      { id: 4, name: "Route 22", origin: "Wapda Town", destination: "New Campus", stops: 18, buses: 5, color: "#be123c" },
-    ];
+    const response = await fetch(`${API_BASE_URL}/routes`, {
+      headers: getHeaders()
+    });
+    const data = await handleResponse(response);
+    return data.routes || data;
   },
 
   getUsers: async () => {
-    await delay(900);
-    return [
-      { id: 1, name: "Zaid Ahmed", email: "zaid.student@pu.edu.pk", department: "IT", status: "Active", joinDate: "Sep 2023" },
-      { id: 2, name: "Ayesha Noor", email: "ayesha.n@pu.edu.pk", department: "Pharmacy", status: "Active", joinDate: "Oct 2023" },
-      { id: 3, name: "Fatima Gul", email: "fatima.g@pu.edu.pk", department: "Law", status: "Inactive", joinDate: "Aug 2023" },
-      { id: 4, name: "Usman Ghani", email: "usman.ghani@pu.edu.pk", department: "Engineering", status: "Active", joinDate: "Nov 2023" },
-      { id: 5, name: "Khadija Ali", email: "khadija.a@pu.edu.pk", department: "Business", status: "Active", joinDate: "Jan 2024" },
-    ];
+    const response = await fetch(`${API_BASE_URL}/auth/get-all-users`, {
+      headers: getHeaders()
+    });
+    return await handleResponse(response);
   },
 
   getLostFoundItems: async () => {
-    await delay(800);
-    return [
-      { id: 1, item: "Scientific Calculator", category: "Electronics", location: "Route 12 - Seat 24", date: "Oct 28, 2023", reportedBy: "Ali Raza", status: "pending" },
-      { id: 2, item: "Leather Wallet (Black)", category: "Personal", location: "Route 5 - Front Row", date: "Oct 27, 2023", reportedBy: "Sana Malik", status: "returned" },
-      { id: 3, item: "PU Student Card", category: "Documents", location: "New Campus Terminal", date: "Oct 26, 2023", reportedBy: "Zainab Bibi", status: "pending" },
-      { id: 4, item: "Blue Backpack", category: "Bag", location: "Route 22", date: "Oct 25, 2023", reportedBy: "Umar Khan", status: "pending" },
-      { id: 5, item: "Apple AirPods", category: "Electronics", location: "Route 8 - Back Seat", date: "Oct 24, 2023", reportedBy: "Fatima Noor", status: "returned" },
-    ];
+    const response = await fetch(`${API_BASE_URL}/lost-found`, {
+      headers: getHeaders()
+    });
+    const data = await handleResponse(response);
+    return data.items || data;
+  },
+
+  login: async (email, password) => {
+    const response = await fetch(`${API_BASE_URL}/auth/signin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    return await handleResponse(response);
+  },
+
+  signup: async (userData) => {
+    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+    return await handleResponse(response);
   }
 };

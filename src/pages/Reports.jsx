@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Filter, 
   Download, 
@@ -10,20 +10,24 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { adminService } from '../services/api';
 
 const Reports = () => {
   const [filter, setFilter] = useState('all');
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const reports = [
-    { id: 'REP-001', student: 'Ahmed Khan', type: 'Conductor Behavior', route: 'Route 12', priority: 'high', status: 'pending', date: 'Oct 24, 2023' },
-    { id: 'REP-002', student: 'Sara Malik', type: 'Bus Delay', route: 'Route 5', priority: 'medium', status: 'reviewed', date: 'Oct 23, 2023' },
-    { id: 'REP-003', student: 'Zainab Bibi', type: 'Lost Item', route: 'Route 8', priority: 'low', status: 'resolved', date: 'Oct 22, 2023' },
-    { id: 'REP-004', student: 'Hamza Ali', type: 'App Bug', route: 'N/A', priority: 'medium', status: 'pending', date: 'Oct 21, 2023' },
-    { id: 'REP-005', student: 'Bilal Hassan', type: 'Bus Condition', route: 'Route 3', priority: 'medium', status: 'reviewed', date: 'Oct 20, 2023' },
-  ];
+  useEffect(() => {
+    const fetchReports = async () => {
+      const data = await adminService.getRecentReports();
+      setReports(data);
+      setLoading(false);
+    };
+    fetchReports();
+  }, []);
 
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'resolved': return 'bg-success/10 text-success border-success/20';
       case 'reviewed': return 'bg-info/10 text-info border-info/20';
       case 'pending': return 'bg-pu-red/10 text-pu-red border-pu-red/20';
@@ -32,7 +36,7 @@ const Reports = () => {
   };
 
   const getPriorityColor = (priority) => {
-    switch (priority) {
+    switch (priority.toLowerCase()) {
       case 'high': return 'text-pu-red';
       case 'medium': return 'text-pu-bronze';
       case 'low': return 'text-success';
@@ -75,62 +79,76 @@ const Reports = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {reports.map((report, i) => (
-                <motion.tr 
-                  key={report.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="hover:bg-secondary/20 transition-colors"
-                >
-                  <td className="px-6 py-4 text-sm font-mono font-bold text-primary">
-                    {report.id}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-primary border border-primary/10">
-                        {report.student[0]}
+              {loading ? (
+                Array(5).fill(0).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-6 py-4"><div className="h-4 w-20 bg-secondary rounded"></div></td>
+                    <td className="px-6 py-4"><div className="h-4 w-32 bg-secondary rounded"></div></td>
+                    <td className="px-6 py-4"><div className="h-4 w-24 bg-secondary rounded"></div></td>
+                    <td className="px-6 py-4"><div className="h-4 w-12 bg-secondary rounded"></div></td>
+                    <td className="px-6 py-4"><div className="h-4 w-12 bg-secondary rounded"></div></td>
+                    <td className="px-6 py-4"><div className="h-6 w-16 bg-secondary rounded-full"></div></td>
+                    <td className="px-6 py-4 text-right"><div className="h-8 w-8 bg-secondary rounded ml-auto"></div></td>
+                  </tr>
+                ))
+              ) : (
+                reports.map((report, i) => (
+                  <motion.tr 
+                    key={report.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="hover:bg-secondary/20 transition-colors"
+                  >
+                    <td className="px-6 py-4 text-[10px] font-mono font-bold text-primary truncate max-w-[100px]">
+                      {report.id}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-primary border border-primary/10">
+                          {report.user?.firstName?.[0] || 'U'}
+                        </div>
+                        <span className="text-sm font-medium text-foreground">{report.user?.firstName} {report.user?.lastName}</span>
                       </div>
-                      <span className="text-sm font-medium text-foreground">{report.student}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-muted-foreground">
-                    {report.type}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-muted-foreground">
-                    {report.route}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`text-xs font-bold uppercase ${getPriorityColor(report.priority)}`}>
-                      {report.priority}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(report.status)}`}>
-                      {report.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 rounded-lg hover:bg-secondary text-primary transition-colors" title="View Details">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 rounded-lg hover:bg-secondary text-success transition-colors" title="Mark Resolved">
-                        <CheckCircle className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-colors">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground capitalize">
+                      {report.type}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {report.route?.name || report.busNumber || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`text-xs font-bold uppercase ${getPriorityColor(report.priority)}`}>
+                        {report.priority}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(report.status)}`}>
+                        {report.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button className="p-2 rounded-lg hover:bg-secondary text-primary transition-colors" title="View Details">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button className="p-2 rounded-lg hover:bg-secondary text-success transition-colors" title="Mark Resolved">
+                          <CheckCircle className="w-4 h-4" />
+                        </button>
+                        <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-colors">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
         
         <div className="p-4 bg-secondary/30 border-t border-border flex items-center justify-between text-sm text-muted-foreground">
-          <p>Showing 5 of 124 reports</p>
+          <p>Showing {reports.length} reports</p>
           <div className="flex items-center gap-2">
             <button className="px-3 py-1 border border-border rounded bg-white disabled:opacity-50">Prev</button>
             <button className="px-3 py-1 border border-border rounded bg-white">Next</button>

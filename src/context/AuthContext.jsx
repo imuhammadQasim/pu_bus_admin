@@ -15,15 +15,19 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (userData) => {
+  const login = (userData, token) => {
     const adminUser = { ...userData, role: 'ADMIN' };
     setUser(adminUser);
     localStorage.setItem('admin_user', JSON.stringify(adminUser));
+    if (token) {
+      localStorage.setItem('admin_token', token);
+    }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('admin_user');
+    localStorage.removeItem('admin_token');
   };
 
   return (
