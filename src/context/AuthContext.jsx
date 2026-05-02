@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { adminService } from "../services/api";
 
 const AuthContext = createContext();
 
@@ -8,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check for existing session
-    const savedUser = localStorage.getItem('admin_user');
+    const savedUser = localStorage.getItem("admin_user");
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
@@ -16,18 +17,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, token) => {
-    const adminUser = { ...userData, role: 'ADMIN' };
+    const adminUser = { ...userData, role: "ADMIN" };
     setUser(adminUser);
-    localStorage.setItem('admin_user', JSON.stringify(adminUser));
+    localStorage.setItem("admin_user", JSON.stringify(adminUser));
     if (token) {
-      localStorage.setItem('admin_token', token);
+      localStorage.setItem("admin_token", token);
     }
   };
 
   const logout = () => {
+    adminService.logout();
     setUser(null);
-    localStorage.removeItem('admin_user');
-    localStorage.removeItem('admin_token');
   };
 
   return (

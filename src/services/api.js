@@ -120,6 +120,11 @@ export const adminService = {
     return await handleResponse(response);
   },
 
+  logout: () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+  },
+
   updateReportStatus: async (id, status) => {
     const response = await fetch(`${API_BASE_URL}/reports/${id}`, {
       method: 'PUT',
