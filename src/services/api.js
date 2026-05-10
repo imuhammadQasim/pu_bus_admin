@@ -79,6 +79,32 @@ export const adminService = {
     return await handleResponse(response);
   },
 
+  createBus: async (busData) => {
+    const response = await fetch(`${API_BASE_URL}/buses/create-bus`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(busData)
+    });
+    return await handleResponse(response);
+  },
+
+  updateBus: async (id, busData) => {
+    const response = await fetch(`${API_BASE_URL}/buses/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(busData)
+    });
+    return await handleResponse(response);
+  },
+
+  deleteBus: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/buses/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    return await handleResponse(response);
+  },
+
   getRoutes: async () => {
     const response = await fetch(`${API_BASE_URL}/routes`, {
       headers: getHeaders()
